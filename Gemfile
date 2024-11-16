@@ -40,6 +40,19 @@ gem 'bootsnap', require: false
 # # Use dotenv to load environment variables from .env
 gem 'dotenv-rails'
 
+# Sidekiq is a simple, efficient background processing for Ruby
+gem 'sidekiq'
+
+# Use Redis as the backend for Active Job
+gem 'redis'
+
+# NokoGiri is a Ruby gem that is used for HTML and XML parsing
+gem 'nokogiri'
+
+# HTTParty is a Ruby gem that is used for making HTTP requests
+gem 'httparty'
+
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem 'database_cleaner'
