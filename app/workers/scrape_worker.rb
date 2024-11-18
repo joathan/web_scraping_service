@@ -14,8 +14,7 @@ class ScrapeWorker
       results = parse_data(document)
       task.update!(status: :completed, results: results)
       
-      # TODO: Implementar a notificação
-      # notify_service(task)
+      notify_service(task)
     else
       task.update!(status: :failed)
     end
@@ -42,12 +41,11 @@ class ScrapeWorker
   end
 
   def notify_service(task)
-    NotificationPublisher.new.publish(
-      {
-        scrape_task_id: task.id,
-        url: task.url,
-        results: task.results
-      }
+    publisher = NotificationPublisher.new
+    publisher.publish(
+      scrape_task_id: task.id,
+      url: task.url,
+      results: task.results
     )
   end
 end
