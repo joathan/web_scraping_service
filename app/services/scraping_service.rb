@@ -1,53 +1,39 @@
 # frozen_string_literal: true
 
-require 'selenium-webdriver'
-
 class ScrapingService
-  SELENIUM_OPTIONS = Selenium::WebDriver::Chrome::Options.new.tap do |opts|
-    opts.add_argument('--headless')
-    opts.add_argument('--disable-gpu')
-    opts.add_argument('--no-sandbox')
-    opts.add_argument('--disable-dev-shm-usage')
-    opts.add_argument('--disable-blink-features=AutomationControlled')
-  end
-
-  def initialize(url)
-    @url = url
-    @driver = Selenium::WebDriver.for :chrome, options: SELENIUM_OPTIONS
+  def initialize(task)
+    @task = task
   end
 
   def perform
-    @driver.navigate.to @url
+    response = HTTParty.get(@task.url)
 
-    js_selector_key = "body > div.pagecontent > div:nth-child(2) > div > div.clearfix.card-container.card-container-miolo > div.esquerda.conteudo-anuncio > div.clearfix.card.card-transparente.card-informacoes-basicas > div > ul > li:nth-child(4) > h6"
-    key_value = get_element_via_js(js_selector_key)
+    return { status: :failed } unless response.code == 200
 
-    js_selector_value = "body > div.pagecontent > div:nth-child(2) > div > div.clearfix.card-container.card-container-miolo > div.esquerda.conteudo-anuncio > div.clearfix.card.card-transparente.card-informacoes-basicas > div > ul > li:nth-child(4) > span"
-    content = get_element_via_js(js_selector_value)
-
-    if content.is_a?(Hash) && content[:error]
-      content
-    else
-      { 
-        "#{key_value}": content }
-    end
-  ensure
-    @driver.quit
+    document = Nokogiri::HTML(response.body)
+    { status: :success, data: parse_data(document) }
+  rescue StandardError => e
+    Rails.logger.error({ message: "Scraping Error", task_id: @task.id, error: e.message }.to_json)
+    { status: :failed }
   end
 
   private
 
-  def wait_for_element(selector, timeout = 20)
-    Selenium::WebDriver::Wait.new(timeout: timeout).until do
-      @driver.find_element(css: selector)
-    end
-  rescue Selenium::WebDriver::Error::TimeoutError
-    nil
+  def parse_data(document)
+    items = document.css('ul.listahorizontal li').map do |item|
+      {
+        label: item.at_css('h6')&.text&.strip,
+        value: item.at_css('span.destaque')&.text&.strip
+      }
+    end.reject { |item| item[:label].nil? && item[:value].nil? }
+
+    items << price(document)
   end
 
-  def get_element_via_js(selector)
-    @driver.execute_script("return document.querySelector('#{selector}').innerText;")
-  rescue Selenium::WebDriver::Error::JavascriptError => e
-    { error: 'JavaScript execution failed', details: e.message }
+  def price(document)
+    {
+      label: 'Preço',
+      value: document.at_css('.preco')&.text&.strip
+    }
   end
 end
