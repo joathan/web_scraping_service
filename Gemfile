@@ -58,6 +58,9 @@ gem 'selenium-webdriver'
 # Bunny is a RabbitMQ Ruby client
 gem 'bunny'
 
+# Sidekiq Cron is a simple job scheduler extension for Sidekiq
+gem 'sidekiq-cron'
+
 # Webdrivers is a Ruby gem that helps to download and install the latest version of WebDriver binaries
 # gem 'webdrivers'
 
