@@ -23,6 +23,8 @@ services:
       - "3000:3000"
     depends_on:
       - db
+      - redis
+      - rabbitmq
 
   sidekiq:
     <<: *web_scraping_app
@@ -54,3 +56,4 @@ volumes:
   bundle_cache:
   redis_data:
   rabbitmq_data:
+    driver: local
