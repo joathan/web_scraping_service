@@ -55,6 +55,9 @@ gem 'httparty'
 # Selenium WebDriver is a web automation framework that allows
 gem 'selenium-webdriver'
 
+# Bunny is a RabbitMQ Ruby client
+gem 'bunny'
+
 # Webdrivers is a Ruby gem that helps to download and install the latest version of WebDriver binaries
 # gem 'webdrivers'
 
