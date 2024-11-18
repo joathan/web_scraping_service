@@ -52,6 +52,11 @@ gem 'nokogiri'
 # HTTParty is a Ruby gem that is used for making HTTP requests
 gem 'httparty'
 
+# Selenium WebDriver is a web automation framework that allows
+gem 'selenium-webdriver'
+
+# Webdrivers is a Ruby gem that helps to download and install the latest version of WebDriver binaries
+# gem 'webdrivers'
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
