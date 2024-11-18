@@ -26,6 +26,16 @@ guard :rspec, cmd: 'bundle exec rspec' do
   # Run route tests when there are changes to config/routes.rb
   watch(rails.routes) { "#{rspec.spec_dir}/routing" }
 
+  # Observes changes to services and runs corresponding service tests
+  watch(%r{^app/services/(.+)\.rb$}) do |m|
+    "spec/services/#{m[1]}_spec.rb"
+  end
+
+  # Observes changes to workers and runs corresponding worker tests
+  watch(%r{^app/workers/(.+)\.rb$}) do |m|
+    "spec/workers/#{m[1]}_spec.rb"
+  end
+
   # Observes changes to models and runs corresponding model tests
   watch(%r{^app/models/(.+)\.rb$}) do |m|
     "spec/models/#{m[1]}_spec.rb"
