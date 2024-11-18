@@ -5,14 +5,15 @@ require 'rails_helper'
 RSpec.describe ScrapeTaskWorker do
   let!(:tasks) { create_list(:scrape_task, 5, status: :pending) }
 
-  it 'processes all tasks using TaskProcessorService' do
-    tasks.each do |task|
-      processor_service = instance_double(Task::ProcessorService)
-
-      expect(Task::ProcessorService).to receive(:new).with(task).and_return(processor_service)
-      expect(processor_service).to receive(:process)
-    end
+  it 'processes all tasks and updates their statuses' do
+    allow_any_instance_of(ScrapingService).to receive(:perform).and_return({ status: :success, data: { foo: 'bar' } })
+    allow_any_instance_of(NotificationService).to receive(:notify)
 
     described_class.new.perform
+
+    tasks.each do |task|
+      expect(task.reload.status).to eq('completed')
+      expect(task.results).to eq({ "foo" => "bar" })
+    end
   end
 end
