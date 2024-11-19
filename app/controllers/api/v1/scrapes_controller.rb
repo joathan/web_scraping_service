@@ -1,17 +1,15 @@
-# frozen_string_literal: true
-
+# app/controllers/api/v1/scrapes_controller.rb
 module Api
   module V1
     class ScrapesController < ApplicationController
-      before_action :validate_url, only: :create
-
       def create
-        result = Scraping::CreatorService.call(scrape_params[:url])
+        scrape_task = ScrapeTask.new(scrape_params)
 
-        if result.is_a?(Hash) && result[:error]
-          render json: { error: 'Failed to create scraping task', details: result[:error] }, status: :unprocessable_entity
+        if scrape_task.save
+          ScrapeWorker.perform_async(scrape_task.id)
+          render json: { task_id: scrape_task.id, message: 'Scraping task created!' }, status: :created
         else
-          render json: { task_id: result.id, message: 'Scraping task created!' }, status: :created
+          render json: { error: 'Failed to create scraping task', details: scrape_task.errors.full_messages }, status: :unprocessable_entity
         end
       end
 
@@ -26,13 +24,6 @@ module Api
 
       def scrape_params
         params.require(:scrape).permit(:url)
-      end
-
-      def validate_url
-        uri = URI.parse(scrape_params[:url])
-        render json: { error: 'Invalid URL' }, status: :unprocessable_entity unless uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)
-      rescue URI::InvalidURIError
-        render json: { error: 'Malformed URL' }, status: :unprocessable_entity
       end
     end
   end
