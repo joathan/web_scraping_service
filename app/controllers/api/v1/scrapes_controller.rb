@@ -6,12 +6,13 @@ module Api
       before_action :validate_url, only: :create
 
       def create
-        scrape_task = ScrapeTask.create!(scrape_params.merge(status: :pending))
-        ScrapeWorker.perform_async(scrape_task.id)
+        result = Scraping::CreatorService.call(scrape_params[:url])
 
-        render json: { task_id: scrape_task.id, message: 'Scraping task created!' }, status: :created
-      rescue ActiveRecord::RecordInvalid => e
-        render json: { error: 'Failed to create scraping task', details: e.record.errors.full_messages }, status: :unprocessable_entity
+        if result.is_a?(Hash) && result[:error]
+          render json: { error: 'Failed to create scraping task', details: result[:error] }, status: :unprocessable_entity
+        else
+          render json: { task_id: result.id, message: 'Scraping task created!' }, status: :created
+        end
       end
 
       def show
