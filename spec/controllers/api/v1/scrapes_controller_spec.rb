@@ -11,6 +11,12 @@ RSpec.describe Api::V1::ScrapesController, type: :controller do
 
       expect(response).to have_http_status(:created)
     end
+
+    it 'returns an error when the URL is invalid' do
+      post :create, params: { scrape: { url: 'invalid_url' } }
+
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
   end
 
   describe 'GET /scrape/:task_id', vcr: true do
@@ -19,6 +25,12 @@ RSpec.describe Api::V1::ScrapesController, type: :controller do
       get :show, params: { id: task.id }
 
       expect(response).to have_http_status(:ok)
+    end
+
+    it 'returns an error when the task is not found' do
+      get :show, params: { id: 0 }
+
+      expect(response).to have_http_status(:not_found)
     end
   end
 end
