@@ -36,6 +36,11 @@ guard :rspec, cmd: 'bundle exec rspec' do
     "spec/workers/#{m[1]}_spec.rb"
   end
 
+  # Observes changes to validators and runs corresponding validator tests
+  watch(%r{^app/validators/(.+)\.rb$}) do |m|
+    "spec/validators/#{m[1]}_spec.rb"
+  end
+
   # Observes changes to models and runs corresponding model tests
   watch(%r{^app/models/(.+)\.rb$}) do |m|
     "spec/models/#{m[1]}_spec.rb"
