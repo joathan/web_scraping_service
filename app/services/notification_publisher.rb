@@ -47,7 +47,6 @@ class NotificationPublisher
   end
 
   def handle_error(exception)
-    # Log the error or send to an error tracking service
     Rails.logger.error("Failed to publish message: #{exception.message}")
     raise exception
   end
