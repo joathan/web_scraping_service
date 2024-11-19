@@ -3,13 +3,12 @@ module Api
   module V1
     class ScrapesController < ApplicationController
       def create
-        scrape_task = ScrapeTask.new(scrape_params)
+        result = Scraping::CreatorService.call(scrape_params[:url])
 
-        if scrape_task.save
-          ScrapeWorker.perform_async(scrape_task.id)
-          render json: { task_id: scrape_task.id, message: 'Scraping task created!' }, status: :created
+        if result.is_a?(Hash) && result[:error]
+          render json: { error: 'Failed to create scraping task', details: result[:error] }, status: :unprocessable_entity
         else
-          render json: { error: 'Failed to create scraping task', details: scrape_task.errors.full_messages }, status: :unprocessable_entity
+          render json: { task_id: result.id, message: 'Scraping task created!' }, status: :created
         end
       end
 
