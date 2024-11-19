@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'vcr'
 require 'webmock/rspec'
 
 VCR.configure do |config|
