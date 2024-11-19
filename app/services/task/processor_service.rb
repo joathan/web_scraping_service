@@ -10,8 +10,11 @@ module Task
       result = ScrapingService.new(@task).perform
 
       if result[:status] == :success
-        @task.update!(status: :completed, results: result[:data])
-        NotificationService.new(@task).notify
+        ActiveRecord::Base.transaction do
+          @task.update!(status: :completed, results: result[:data], error_message: nil)
+
+          NotificationService.new(@task).notify
+        end
       else
         @task.update!(status: :failed)
       end
