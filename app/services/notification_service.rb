@@ -6,7 +6,7 @@ class NotificationService
   end
 
   def notify
-    publisher = NotificationPublisher.new
+    publisher = Notification::PublisherService.new
     publisher.publish(notification_payload)
     Rails.logger.info({ message: "Notification Sent", task_id: @task.id }.to_json)
   rescue StandardError => e
