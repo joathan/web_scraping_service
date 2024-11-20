@@ -2,8 +2,11 @@
 module Api
   module V1
     class ScrapesController < ApplicationController
+      before_action :token, only: %i[create]
+
       def create
-        result = Scraping::CreatorService.call(scrape_params)
+        Rails.logger.info "Creating scraping task for user: #{scrape_params[:user_id]}"
+        result = Scraping::CreatorService.call(scrape_params, token)
 
         if result.is_a?(Hash) && result[:error]
           render json: { error: 'Failed to create scraping task', details: result[:error] }, status: :unprocessable_entity
@@ -23,6 +26,10 @@ module Api
 
       def scrape_params
         params.require(:scrape).permit(:task_id, :url, :user_id)
+      end
+
+      def token
+        request.headers['Authorization']&.split(' ')&.last
       end
     end
   end
