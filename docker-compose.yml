@@ -5,7 +5,7 @@ services:
     platform: linux/x86_64
     tty: true
     build: .
-    command: sh /app/entrypoint.sh rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'
+    command: sh /app/entrypoint.sh
     volumes:
       - .:/app
       - bundle_cache:/usr/local/bundle
@@ -20,7 +20,7 @@ services:
   sidekiq:
     <<: *web_scraping_service
     container_name: sidekiq
-    command: sh /app/entrypoint.sh bundle exec sidekiq -C config/sidekiq.yml
+    command: bundle exec sidekiq -C config/sidekiq.yml
     ports:
       - "${PORT:-3401}:3000"
 
