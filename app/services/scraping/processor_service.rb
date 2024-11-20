@@ -11,7 +11,11 @@ module Scraping
 
       if result[:status] == :success
         @task.update!(status: :completed, results: result[:data])
-        Scraping::NotifierService.new(@task).notify
+        # TODO: remover o comentário abaixo para habilitar a notificação
+        # Nota: a notificação só deve ser enviada se o scraping for bem-sucedido
+        # e os dados forem salvos com sucesso no banco de dados
+        # usando rabbitmq
+        # Scraping::NotifierService.new(@task).notify
       else
         @task.update!(status: :failed)
       end
