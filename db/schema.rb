@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_11_20_205202) do
+ActiveRecord::Schema[7.1].define(version: 2024_11_20_213242) do
   create_table "scrape_tasks", charset: "utf8mb3", force: :cascade do |t|
     t.string "url"
     t.integer "status"
@@ -19,6 +19,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_20_205202) do
     t.datetime "updated_at", null: false
     t.string "error_message"
     t.integer "task_id"
+    t.integer "user_id"
   end
 
 end
