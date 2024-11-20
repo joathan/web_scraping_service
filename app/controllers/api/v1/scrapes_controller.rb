@@ -22,7 +22,7 @@ module Api
       private
 
       def scrape_params
-        params.require(:scrape).permit(:task_id, :url)
+        params.require(:scrape).permit(:task_id, :url, :user_id)
       end
     end
   end

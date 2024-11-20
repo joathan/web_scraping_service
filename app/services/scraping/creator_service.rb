@@ -6,7 +6,8 @@ module Scraping
       scrape_task = ScrapeTask.create!(
         task_id: params[:task_id],
         url: params[:url],
-        status: :pending
+        status: :pending,
+        user_id: params[:user_id]
       )
 
       ScrapeWorker.perform_async(scrape_task.id)
