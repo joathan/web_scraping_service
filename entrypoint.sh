@@ -14,5 +14,8 @@ bundle exec rails db:create
 echo "Aplicando migrações..."
 bundle exec rails db:migrate
 
+# Inicia o servidor
 echo "Iniciando o processo principal..."
+rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'
+
 exec "$@"
