@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     libxslt1-dev default-libmysqlclient-dev nodejs \
     wget \
     unzip \
+    default-mysql-client \
     curl \
     gnupg \
     libnss3 \
