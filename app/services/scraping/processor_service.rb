@@ -2,8 +2,9 @@
 
 module Scraping
   class ProcessorService
-    def initialize(task)
+    def initialize(task, token)
       @task = task
+      @token = token
     end
 
     def process
@@ -11,11 +12,8 @@ module Scraping
 
       if result[:status] == :success
         @task.update!(status: :completed, results: result[:data])
-        # TODO: remover o comentário abaixo para habilitar a notificação
-        # Nota: a notificação só deve ser enviada se o scraping for bem-sucedido
-        # e os dados forem salvos com sucesso no banco de dados
-        # usando rabbitmq
-        # Scraping::NotifierService.new(@task).notify
+
+        NotificationService.send_notification(task_payload_notification, @token)
       else
         @task.update!(status: :failed)
       end
@@ -23,6 +21,17 @@ module Scraping
       @task.update!(status: :failed, error_message: e.message)
       Rails.logger.error({ message: "Task Processing Error", task_id: @task.id, error: e.message }.to_json)
       raise e
+    end
+
+    def task_payload_notification
+      {
+        notification: {
+          task_id: @task.task_id,
+          details: @task.results,
+          status: @task.status,
+          user_id: @task.user_id,
+        }
+      }
     end
   end
 end
