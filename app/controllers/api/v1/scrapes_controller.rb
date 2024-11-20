@@ -3,7 +3,7 @@ module Api
   module V1
     class ScrapesController < ApplicationController
       def create
-        result = Scraping::CreatorService.call(scrape_params[:url])
+        result = Scraping::CreatorService.call(scrape_params)
 
         if result.is_a?(Hash) && result[:error]
           render json: { error: 'Failed to create scraping task', details: result[:error] }, status: :unprocessable_entity
@@ -22,7 +22,7 @@ module Api
       private
 
       def scrape_params
-        params.require(:scrape).permit(:url)
+        params.require(:scrape).permit(:task_id, :url)
       end
     end
   end
