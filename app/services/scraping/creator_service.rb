@@ -2,7 +2,7 @@
 
 module Scraping
   class CreatorService
-    def self.call(params)
+    def self.call(params, token)
       scrape_task = ScrapeTask.create!(
         task_id: params[:task_id],
         url: params[:url],
@@ -10,7 +10,7 @@ module Scraping
         user_id: params[:user_id]
       )
 
-      ScrapeWorker.perform_async(scrape_task.id)
+      ScrapeWorker.perform_async(scrape_task.id, token)
 
       scrape_task
     rescue ActiveRecord::RecordInvalid => e
