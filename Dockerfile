@@ -43,12 +43,5 @@ RUN bundle config set force_ruby_platform true && bundle install
 # Copia o restante do código para o container
 COPY . .
 
-# Copia o script de entrada
-COPY entrypoint.sh /usr/bin/entrypoint.sh
-RUN chmod +x /usr/bin/entrypoint.sh
-
 # Define a porta de exposição
 EXPOSE 3000
-
-# Define o entrypoint
-ENTRYPOINT ["sh", "/usr/bin/entrypoint.sh"]
