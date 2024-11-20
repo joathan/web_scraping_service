@@ -1,26 +1,19 @@
 # frozen_string_literal: true
 
+require 'net/http'
+
 class NotificationService
-  def initialize(task)
-    @task = task
-  end
+  NOTIFICATION_SERVICE_URL = ENV.fetch('NOTIFICATION_SERVICE_URL', 'http://notifications_service:3000/api/v1/notifications').freeze
 
-  def notify
-    publisher = Notification::PublisherService.new
-    publisher.publish(notification_payload)
-    Rails.logger.info({ message: "Notification Sent", task_id: @task.id }.to_json)
-  rescue StandardError => e
-    Rails.logger.error({ message: "Notification Error", task_id: @task.id, error: e.message }.to_json)
-    raise e
-  end
+  def self.send_notification(notification_payload, user_token)
+    response = ExternalService.post(NOTIFICATION_SERVICE_URL, notification_payload, user_token)
 
-  private
-
-  def notification_payload
-    {
-      scrape_task_id: @task.id,
-      url: @task.url,
-      results: @task.results
-    }
+    if response
+      Rails.logger.info "Notification sent successfully: #{notification_payload}"
+      response
+    else
+      Rails.logger.error "Failed to send notification."
+      nil
+    end
   end
 end
