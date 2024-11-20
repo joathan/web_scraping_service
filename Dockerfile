@@ -1,5 +1,6 @@
-FROM ruby:3.3.0
+FROM ruby:3.3.0-slim
 
+# Instala dependências do sistema
 RUN apt-get update && apt-get install -y \
     build-essential libxml2-dev \
     libxslt1-dev default-libmysqlclient-dev nodejs \
@@ -20,8 +21,11 @@ RUN apt-get update && apt-get install -y \
     libdrm2 \
     chromium \
     chromium-driver \
-    --no-install-recommends && rm -rf /var/lib/apt/lists/*
+    --no-install-recommends \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
+# Instala o ChromeDriver
 RUN wget -q "https://chromedriver.storage.googleapis.com/$(wget -q -O - https://chromedriver.storage.googleapis.com/LATEST_RELEASE)/chromedriver_linux64.zip" \
     && unzip chromedriver_linux64.zip \
     && mv chromedriver /usr/local/bin/ \
@@ -30,11 +34,21 @@ RUN wget -q "https://chromedriver.storage.googleapis.com/$(wget -q -O - https://
 
 WORKDIR /app
 
-COPY . /app
+# Copia o Gemfile e Gemfile.lock para aproveitar cache
+COPY Gemfile Gemfile.lock ./
 
-RUN bundle config set force_ruby_platform true
-RUN bundle install
+# Instala gems
+RUN bundle config set force_ruby_platform true && bundle install
 
+# Copia o restante do código para o container
+COPY . .
+
+# Copia o script de entrada
+COPY entrypoint.sh /usr/bin/entrypoint.sh
+RUN chmod +x /usr/bin/entrypoint.sh
+
+# Define a porta de exposição
 EXPOSE 3000
 
-CMD ["rails", "server", "-b", "0.0.0.0"]
+# Define o entrypoint
+ENTRYPOINT ["sh", "/usr/bin/entrypoint.sh"]
