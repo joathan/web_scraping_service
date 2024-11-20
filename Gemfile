@@ -37,7 +37,7 @@ gem 'bootsnap', require: false
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 # gem 'rack-cors'
 
-# # Use dotenv to load environment variables from .env
+# Use dotenv to load environment variables from .env
 gem 'dotenv-rails'
 
 # Sidekiq is a simple, efficient background processing for Ruby
