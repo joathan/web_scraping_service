@@ -5,7 +5,8 @@ class ScrapeTaskWorker
 
   def perform
     ScrapeTask.where(status: [:pending, :failed]).find_each(batch_size: 100) do |task|
-      Scraping::ProcessorService.new(task).process
+      # TODO: rever esse worker
+      # Scraping::ProcessorService.new(task).process
     end
   end
 end
