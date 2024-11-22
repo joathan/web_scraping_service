@@ -11,16 +11,19 @@ DB_NAME=${DB_NAME:-app_database}
 echo "Conectando ao MySQL em $DB_HOST:$DB_PORT..."
 
 # Comando para verificar se a base de dados existe
-DB_EXISTS=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" -e "SHOW DATABASES LIKE '$DB_NAME';" | grep "$DB_NAME" || true)
+DB_EXISTS=$(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" -e "SHOW DATABASES LIKE '$DB_NAME';" 2>/dev/null | grep "$DB_NAME" || true)
 
 if [ "$DB_EXISTS" == "$DB_NAME" ]; then
   echo "Banco de dados '$DB_NAME' já existe. Nenhuma ação necessária."
 else
   echo "Banco de dados '$DB_NAME' não encontrado. Criando..."
-  mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" -e "CREATE DATABASE $DB_NAME;"
+  mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASSWORD" -e "CREATE DATABASE $DB_NAME;" || {
+    echo "Erro ao criar banco de dados."
+    exit 1
+  }
   echo "Banco de dados '$DB_NAME' criado com sucesso!"
 fi
 
-# Continuar com o restante do processo (substituir por comandos reais)
+# Continuar com o restante do processo
 echo "Executando comandos adicionais..."
 exec "$@"
